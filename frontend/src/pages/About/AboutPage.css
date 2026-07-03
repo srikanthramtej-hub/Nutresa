@@ -1,0 +1,75 @@
+
+
+.about__hero { background: linear-gradient(135deg, var(--green-900) 0%, var(--green-700) 100%); padding: 72px 24px; color: white; }
+.about__hero-inner { max-width: 680px; margin: 0 auto; text-align: center; }
+.about__hero-title { font-family: var(--font-serif); font-size: 46px; font-weight: 700; line-height: 1.12; margin-bottom: 18px; }
+.about__hero-desc  { font-size: 16px; line-height: 1.8; color: rgba(255,255,255,0.72); }
+
+.about__cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 20px; }
+.about__card {
+  background: white; border: 1px solid var(--green-100);
+  border-radius: var(--radius-lg); padding: 26px 22px;
+  text-align: center; transition: box-shadow 0.22s, transform 0.22s;
+}
+.about__card:hover { box-shadow: var(--shadow-md); transform: translateY(-4px); }
+.about__card-icon  { font-size: 42px; margin-bottom: 14px; }
+.about__card-title { font-family: var(--font-serif); font-size: 18px; font-weight: 600; color: var(--green-900); margin-bottom: 10px; }
+.about__card-text  { font-size: 13px; color: var(--gray-600); line-height: 1.75; }
+
+.about__stats-banner { background: var(--green-900); padding: 64px 24px; color: white; }
+.about__stats-inner  {
+  max-width: 1060px; margin: 0 auto;
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 56px; align-items: center;
+}
+.about__stats-title { font-family: var(--font-serif); font-size: 34px; font-weight: 700; margin-bottom: 14px; line-height: 1.2; }
+.about__stats-desc  { font-size: 14px; line-height: 1.8; color: rgba(255,255,255,0.62); }
+.about__stats-grid  { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.about__stat-box    {
+  background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);
+  border-radius: var(--radius-md); padding: 22px; text-align: center;
+}
+.about__stat-val    { font-family: var(--font-serif); font-size: 36px; font-weight: 700; color: var(--green-300); line-height: 1; margin-bottom: 6px; }
+.about__stat-label  { font-size: 12px; color: rgba(255,255,255,0.5); }
+
+.about__nutrition-table-wrap { overflow-x: auto; border-radius: var(--radius-md); border: 1px solid var(--gray-200); }
+.about__nutrition-table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 460px; }
+.about__nutrition-table th {
+  padding: 12px 18px; text-align: left;
+  font-size: 11px; font-weight: 600; color: var(--gray-400);
+  text-transform: uppercase; letter-spacing: 0.5px;
+  background: var(--gray-50); border-bottom: 1.5px solid var(--gray-200);
+}
+.about__nutrition-table td   { padding: 13px 18px; color: var(--gray-700); border-bottom: 1px solid var(--gray-100); }
+.about__nutrition-table tr:last-child td { border-bottom: none; }
+.about__nutrition-table tr:hover td     { background: var(--green-50); }
+.about__nutrition-name { font-weight: 600 !important; color: var(--gray-800) !important; }
+
+.about__cta-section { background: var(--green-50); padding: 64px 24px; text-align: center; }
+.about__cta-inner   { max-width: 480px; margin: 0 auto; }
+.about__cta-title   { font-family: var(--font-serif); font-size: 34px; font-weight: 700; color: var(--green-900); margin-bottom: 14px; line-height: 1.2; }
+.about__cta-sub     { font-size: 14px; color: var(--gray-400); margin-bottom: 28px; }
+.about__cta-btn {
+  padding: 14px 36px; background: var(--green-700); color: white;
+  border: none; border-radius: var(--radius-sm); font-size: 15px; font-weight: 600;
+  cursor: pointer; font-family: var(--font-sans); transition: background 0.2s, transform 0.2s;
+}
+.about__cta-btn:hover { background: var(--green-900); transform: translateY(-2px); }
+
+/* Responsive */
+@media (max-width: 1023px) {
+  .about__stats-inner { grid-template-columns: 1fr; gap: 32px; }
+  .about__hero-title  { font-size: 36px; }
+}
+@media (max-width: 767px) {
+  .about__hero        { padding: 52px 20px; }
+  .about__hero-title  { font-size: 28px; }
+  .about__stats-title { font-size: 26px; }
+  .about__cta-title   { font-size: 26px; }
+  .about__stats-banner{ padding: 48px 20px; }
+}
+@media (max-width: 479px) {
+  .about__hero-title  { font-size: 24px; }
+  .about__cards-grid  { grid-template-columns: 1fr; }
+  .about__stats-grid  { grid-template-columns: 1fr 1fr; gap: 12px; }
+}

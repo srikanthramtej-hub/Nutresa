@@ -1,0 +1,247 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+.login__page {
+  position: relative;
+  min-height: 100vh;
+  width: 100vw;
+  overflow-x: hidden;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: radial-gradient(circle at center, #ffffff 0%, #fff7ed 100%);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* ── Background nuts ── */
+.login__background-ambiance {
+  position: absolute; inset: 0;
+  pointer-events: none; z-index: 2; overflow: hidden;
+}
+.floating-nut { position: absolute; object-fit: contain; }
+.bg-size-large   { width: 110px; height: 110px; opacity: 0.65; }
+.bg-size-massive { width: 195px; height: 195px; opacity: 0.45; }
+.bg-blur-light   { filter: blur(1px); }
+.bg-blur-medium  { filter: blur(3px); }
+.bg-blur-heavy   { filter: blur(7px); z-index: 25; }
+.pos-1 { top: -5%;   left: 4%;   }
+.pos-2 { top:  8%;   right: -2%; }
+.pos-3 { bottom: 15%; left: 10%; }
+.pos-4 { top: 25%;   left: 35%;  }
+.pos-5 { bottom: -2%; right: 15%;}
+.pos-6 { top: 60%;   left: -4%;  }
+.pos-7 { top: -8%;   left: 45%;  }
+
+/* ── Convoy container ── */
+.login__convoy-container {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  width: max-content;
+  padding: 30px;
+  position: relative;
+  z-index: 10;
+}
+
+/* ── Cabin ── */
+.truck__cabin {
+  position: relative;
+  width: 180px; height: 110px;
+  background: linear-gradient(145deg, #ef4444, #991b1b);
+  border-radius: 28px 18px 10px 10px;
+  box-shadow: 0 18px 30px rgba(0,0,0,.18), inset 0 2px 4px rgba(255,255,255,.2);
+  overflow: visible;
+}
+.truck__windshield {
+  position: absolute; top: 14px; left: 14px;
+  width: 68px; height: 42px;
+  background: linear-gradient(180deg, #dbeafe, #7dd3fc);
+  border-radius: 14px; transform: skew(-12deg);
+  border: 2px solid rgba(255,255,255,.5);
+}
+.truck__ev-lightbar {
+  position: absolute; bottom: 22px; right: -4px;
+  width: 10px; height: 24px;
+  background: #fde047; border-radius: 6px;
+  box-shadow: 0 0 18px #fde047;
+}
+.truck__brand {
+  position: absolute; bottom: 22px; right: 15px;
+  color: white; font-size: 11px; font-weight: 800;
+  background: rgba(0,0,0,.2); padding: 4px 10px; border-radius: 6px;
+}
+.truck__cabin::before {
+  content: ''; position: absolute; top: 0; left: -50%;
+  width: 40%; height: 100%;
+  background: rgba(255,255,255,.18); transform: skewX(-20deg);
+  animation: truckShine 3s linear infinite;
+}
+@keyframes truckShine { from { left: -50%; } to { left: 140%; } }
+
+/* ── Hitch chain ── */
+.truck__hitch-chain {
+  width: 35px; height: 8px;
+  background: repeating-linear-gradient(90deg, #94a3b8, #94a3b8 6px, #475569 6px, #475569 12px);
+  margin-bottom: 15px; border-radius: 4px;
+  box-shadow: 0 4px 6px rgba(0,0,0,.1);
+}
+.long-link { width: 55px; }
+
+/* ── Trailer ── */
+.truck__trailer {
+  position: relative;
+  width: 320px; height: 90px;
+  background: linear-gradient(180deg, #92400e, #451a03);
+  border-radius: 10px;
+  border: 3px solid rgba(255,255,255,.08);
+  box-shadow: 0 18px 35px rgba(0,0,0,.2), inset 0 2px 3px rgba(255,255,255,.08);
+}
+.trailer__label {
+  width: 100%; text-align: center;
+  color: #fef9c3; font-size: 11px; letter-spacing: 0.18em; font-weight: 800;
+  margin-top: 42px;
+}
+.trailer__pile-container {
+  position: absolute; top: -80px; left: 10px; right: 10px;
+  height: 90px; overflow: visible;
+}
+.cargo-item { position: absolute; object-fit: contain; filter: drop-shadow(0 8px 6px rgba(0,0,0,.15)); }
+.item-walnut-bg       { width: 50px; height: 50px; left: 80px;  bottom: 5px;  z-index: 1; opacity: .9; }
+.item-almond-l        { width: 45px; height: 45px; left: 10px;  bottom: -5px; z-index: 3; transform: rotate(-15deg); }
+.item-cashew-c        { width: 42px; height: 42px; left: 55px;  bottom: -2px; z-index: 4; transform: rotate(10deg); }
+.item-walnut-top      { width: 55px; height: 55px; left: 100px; bottom: 20px; z-index: 2; }
+.item-pistachio-r     { width: 40px; height: 40px; right: 20px; bottom: 5px;  z-index: 3; transform: rotate(25deg); }
+.item-dates-edge      { width: 48px; height: 48px; right: -5px; bottom: -8px; z-index: 4; transform: rotate(-10deg); }
+.item-fig-front       { width: 46px; height: 46px; left: 140px; bottom: -8px; z-index: 5; }
+.item-sunflower-accent{ width: 38px; height: 38px; left: 30px;  bottom: 12px; z-index: 4; transform: rotate(-20deg); }
+
+/* ── Wheels ── */
+.truck__wheel {
+  position: absolute; bottom: -18px;
+  width: 38px; height: 38px; border-radius: 50%;
+  background: radial-gradient(circle at center, #94a3b8 10%, #1e293b 45%, #020617 100%);
+  border: 4px solid #e2e8f0;
+  animation: spin .9s linear infinite;
+  box-shadow: inset 0 0 8px rgba(255,255,255,.2), 0 6px 10px rgba(0,0,0,.3);
+}
+.truck__wheel-inner {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  width: 8px; height: 8px; background: #fff; border-radius: 50%;
+}
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+.wheel__pos-left  { left: 16px; }
+.wheel__pos-right { right: 16px; }
+.wheel__pos-t1    { left: 20px; }
+.wheel__pos-t2    { left: 56px; }
+.wheel__pos-t3    { right: 20px; }
+.wheel__pos-t4    { right: 56px; }
+
+/* ── Login card ── */
+.login__card {
+  width: 380px;
+  background: #ffffff;
+  border-radius: 24px; padding: 36px;
+  box-shadow: 0 30px 60px -15px rgba(0,0,0,.08);
+  border: 1px solid #f1f5f9;
+}
+.login__logo { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+.login__logo-icon { font-size: 22px; }
+.login__logo-name { font-weight: 800; font-size: 18px; color: #166534; }
+.login__title    { font-size: 26px; font-weight: 800; color: #0f172a; margin: 0 0 6px; }
+.login__subtitle { font-size: 14px; color: #64748b; margin: 0 0 24px; }
+.login__google-btn {
+  width: 100%; display: flex; align-items: center; justify-content: center; gap: 12px;
+  background: #fff; border: 1px solid #e2e8f0; padding: 12px; border-radius: 12px;
+  font-size: 14px; font-weight: 600; color: #334155; cursor: pointer;
+  transition: background .2s; font-family: inherit;
+}
+.login__google-btn:hover { background: #f8fafc; }
+.login__divider { display: flex; align-items: center; margin: 20px 0; }
+.login__divider-line { flex: 1; height: 1px; background: #e2e8f0; }
+.login__divider-text { font-size: 12px; color: #94a3b8; padding: 0 12px; }
+.login__error-box {
+  background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px;
+  padding: 12px; font-size: 13px; color: #dc2626; margin-bottom: 16px;
+}
+.login__card .form-input:focus {
+  border-color: #ea580c;
+  box-shadow: 0 0 0 4px rgba(234,88,12,.12);
+}
+.login__submit-btn {
+  width: 100%; padding: 14px; background: #ea580c; color: white; border: none;
+  border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer;
+  transition: background .2s; margin-top: 8px; font-family: inherit;
+}
+.login__submit-btn:hover:not(:disabled) { background: #c2410c; }
+.login__submit-btn:disabled { opacity: .45; cursor: not-allowed; }
+.login__switch { font-size: 14px; color: #64748b; margin-top: 24px; text-align: center; }
+.login__switch-btn {
+  background: none; border: none; color: #ea580c; font-weight: 700;
+  cursor: pointer; padding: 0 4px; font-family: inherit;
+}
+
+/* ── Road ── */
+.login__roadway {
+  position: absolute; bottom: 0; left: 0;
+  width: 100%; height: 8px; background: #cbd5e1;
+}
+
+
+@media (max-width: 1023px) {
+
+  .login__page {
+    min-height: 100dvh;
+    height: 100dvh;
+    padding: 0;
+    justify-content: flex-start;
+    align-items: stretch;
+    overflow-y: auto;
+    background: linear-gradient(160deg, #faf4ea 0%, #f3e4c9 100%);
+  }
+
+  .login__convoy-container {
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    padding: 0;
+    display: flex;
+  }
+
+  .login__card {
+    width: 100%;
+    height: 100%;
+    min-height: 100dvh;
+    max-width: none;
+    border-radius: 0;
+    margin: 0;
+    padding: 32px 24px;
+    box-shadow: none;
+    border: none;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .login__background-ambiance {
+    display: none;
+  }
+  /* Hide truck parts */
+  .truck__cabin,
+  .truck__hitch-chain,
+  .truck__trailer,
+  .login__roadway {
+    display: none;
+  }
+}
+@media (max-width: 480px) {
+  .login__card { padding: 28px 18px; border-radius: 18px; }
+  .login__title { font-size: 22px; }
+}
+
+@media (max-width: 380px) {
+  .login__card { padding: 22px 14px; }
+  .login__title { font-size: 20px; }
+}

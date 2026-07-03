@@ -1,0 +1,293 @@
+.as__root { display: flex; flex-direction: column; gap: 28px; }
+
+/* ── Section ── */
+.as__section {
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.as__section-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--gray-100);
+  background: var(--cream-50);
+}
+
+.as__section-title {
+  font-family: var(--font-serif);
+  font-size: 18px; font-weight: 700;
+  color: var(--maroon-900); margin-bottom: 4px;
+}
+
+.as__section-sub {
+  font-size: 13px; color: var(--gray-400);
+}
+
+/* ── GST Card ── */
+.as__gst-card { padding: 22px 24px; }
+
+.as__gst-toggle-row {
+  display: flex; justify-content: space-between;
+  align-items: center; gap: 16px;
+  padding: 16px 18px;
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-md);
+}
+
+.as__gst-toggle-info { display: flex; align-items: center; gap: 12px; }
+
+.as__gst-toggle-label {
+  font-size: 16px; font-weight: 700;
+  color: var(--maroon-900);
+}
+
+.as__gst-status-pill {
+  font-size: 12px; font-weight: 600;
+  padding: 4px 12px; border-radius: 20px;
+  background: var(--gray-100); color: var(--gray-400);
+  transition: all 0.3s;
+}
+.as__gst-status-pill--on {
+  background: var(--maroon-100);
+  color: var(--maroon-700);
+}
+
+/* ── Toggle Switch ── */
+.as__toggle-switch {
+  position: relative;
+  width: 52px; height: 28px;
+  border-radius: 14px;
+  background: var(--gray-200);
+  border: none; cursor: pointer;
+  transition: background 0.3s;
+  flex-shrink: 0;
+  padding: 0;
+}
+.as__toggle-switch--on { background: var(--maroon-700); }
+
+.as__toggle-switch--sm {
+  width: 40px; height: 22px;
+  border-radius: 11px;
+}
+
+.as__toggle-knob {
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  transition: transform 0.3s cubic-bezier(0.34,1.3,0.64,1);
+  display: block;
+}
+.as__toggle-switch--on .as__toggle-knob { transform: translateX(24px); }
+.as__toggle-switch--sm .as__toggle-knob { width: 16px; height: 16px; }
+.as__toggle-switch--sm.as__toggle-switch--on .as__toggle-knob { transform: translateX(18px); }
+
+/* ── GST Rates ── */
+.as__gst-rates {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid var(--gray-100);
+  animation: fadeSlideIn 0.25s ease;
+}
+
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.as__gst-rate-label {
+  font-size: 13px; font-weight: 600;
+  color: var(--gray-600); margin-bottom: 12px;
+}
+
+.as__gst-rate-grid {
+  display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px;
+}
+
+.as__gst-rate-btn {
+  padding: 9px 20px;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--gray-200);
+  background: white; color: var(--gray-600);
+  font-size: 14px; font-weight: 600;
+  cursor: pointer; font-family: var(--font-sans);
+  transition: all 0.18s;
+}
+.as__gst-rate-btn:hover { border-color: var(--maroon-300); color: var(--maroon-700); }
+.as__gst-rate-btn--active {
+  border-color: var(--maroon-700);
+  background: var(--maroon-50);
+  color: var(--maroon-700);
+  box-shadow: 0 0 0 3px rgba(127,32,32,0.1);
+}
+
+.as__gst-preview {
+  background: var(--cream-50);
+  border: 1px solid var(--cream-200);
+  border-radius: var(--radius-sm);
+  padding: 11px 16px;
+  font-size: 13px; color: var(--gray-600);
+}
+.as__gst-preview strong { color: var(--maroon-700); font-size: 15px; }
+.as__gst-preview-note  { color: var(--gray-400); }
+
+/* ── Offer Form ── */
+.as__offer-form-card {
+  margin: 20px 24px;
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  padding: 22px;
+}
+
+.as__form-title {
+  font-family: var(--font-serif);
+  font-size: 16px; font-weight: 700;
+  color: var(--maroon-900); margin-bottom: 18px;
+}
+
+.as__form-error {
+  background: #fef2f2; border: 1px solid #fecaca;
+  border-radius: var(--radius-sm); padding: 11px 15px;
+  font-size: 13px; color: var(--red); margin-bottom: 16px;
+}
+
+.as__form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.as__form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+
+/* Code row */
+.as__code-row { display: flex; gap: 8px; }
+.as__code-input { flex: 1; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+.as__gen-btn {
+  padding: 0 14px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--maroon-300);
+  background: white; color: var(--maroon-700);
+  font-size: 12px; font-weight: 600;
+  cursor: pointer; white-space: nowrap;
+  font-family: var(--font-sans);
+  transition: background 0.18s;
+}
+.as__gen-btn:hover { background: var(--maroon-50); }
+
+/* Active row */
+.as__form-active-row {
+  margin-bottom: 18px;
+  padding: 12px 16px;
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+}
+.as__form-active-label {
+  display: flex; justify-content: space-between;
+  align-items: center; font-size: 14px;
+  font-weight: 500; color: var(--gray-700);
+  cursor: pointer;
+}
+
+.as__form-actions {
+  display: flex; gap: 10px; justify-content: flex-end;
+}
+
+/* ── Offers List ── */
+.as__offers-list { padding: 0 24px 24px; }
+.as__offers-list-title {
+  font-size: 14px; font-weight: 600;
+  color: var(--gray-600); margin-bottom: 14px;
+  padding-top: 4px;
+}
+
+.as__offer-card {
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  padding: 16px 18px; margin-bottom: 12px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.as__offer-card:hover        { border-color: var(--maroon-200); box-shadow: var(--shadow-sm); }
+.as__offer-card--disabled    { opacity: 0.55; }
+
+.as__offer-card-top {
+  display: flex; justify-content: space-between;
+  align-items: flex-start; margin-bottom: 12px; gap: 10px;
+}
+.as__offer-card-left { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+.as__offer-title {
+  font-size: 15px; font-weight: 700; color: var(--maroon-900);
+}
+.as__offer-code-pill {
+  font-size: 12px; font-weight: 700;
+  letter-spacing: 1.5px;
+  background: var(--cream-100);
+  color: var(--maroon-700);
+  border: 1px solid var(--cream-200);
+  padding: 3px 10px; border-radius: 6px;
+  font-family: monospace;
+}
+
+.as__offer-details {
+  display: flex; flex-wrap: wrap; gap: 16px;
+  margin-bottom: 10px;
+}
+.as__offer-detail-item { display: flex; flex-direction: column; gap: 2px; }
+.as__offer-detail-label { font-size: 10px; font-weight: 600; color: var(--gray-400); text-transform: uppercase; letter-spacing: 0.5px; }
+.as__offer-detail-val   { font-size: 13px; font-weight: 500; color: var(--gray-700); }
+.as__discount-val       { color: var(--maroon-700); font-size: 15px; font-weight: 700; }
+.as__days-left          { font-size: 11px; color: var(--maroon-500); font-weight: 600; }
+
+.as__offer-desc {
+  font-size: 13px; color: var(--gray-400);
+  font-style: italic; margin-bottom: 12px;
+  padding: 8px 12px; background: var(--gray-50);
+  border-radius: var(--radius-sm); border-left: 3px solid var(--cream-200);
+}
+
+.as__offer-actions {
+  display: flex; align-items: center; gap: 10px;
+  padding-top: 12px; border-top: 1px solid var(--gray-100);
+}
+.as__offer-action-label { font-size: 12px; color: var(--gray-400); font-weight: 500; flex: 1; }
+
+.as__action-btn {
+  padding: 5px 13px; border-radius: 6px;
+  font-size: 12px; font-weight: 600;
+  border: none; cursor: pointer;
+  font-family: var(--font-sans);
+  transition: opacity 0.15s;
+}
+.as__action-btn:hover { opacity: 0.75; }
+.as__action-btn--edit   { background: var(--gray-100); color: var(--gray-600); }
+.as__action-btn--delete { background: #fef2f2; color: var(--red); }
+
+/* Empty state */
+.as__empty-offers {
+  text-align: center; padding: 36px 24px;
+  color: var(--gray-400); font-size: 14px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .as__form-grid-2 { grid-template-columns: 1fr; }
+  .as__form-grid-3 { grid-template-columns: 1fr 1fr; }
+  .as__gst-card,
+  .as__offer-form-card { padding: 16px; }
+  .as__offers-list     { padding: 0 16px 16px; }
+}
+@media (max-width: 480px) {
+  .as__form-grid-3 { grid-template-columns: 1fr; }
+  .as__offer-details   { gap: 10px; }
+}
+
+/* Auto-saved badge */
+.as__auto-saved {
+  font-size: 12px; font-weight: 600;
+  color: #16a34a; background: #dcfce7;
+  padding: 4px 12px; border-radius: 20px;
+  border: 1px solid #bbf7d0;
+  animation: fadeSlideIn 0.3s ease;
+}

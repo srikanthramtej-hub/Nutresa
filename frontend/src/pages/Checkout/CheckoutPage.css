@@ -1,0 +1,285 @@
+
+
+.checkout__container { max-width: 1060px; margin: 0 auto; padding: 36px 24px; }
+
+/* Back button */
+.checkout__back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: var(--maroon-700);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  margin-bottom: 20px;
+  padding: 6px 0;
+  transition: color 0.18s;
+}
+.checkout__back-btn:hover { color: var(--maroon-900); }
+
+.checkout__page-title {
+  font-family: var(--font-serif);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--maroon-900);
+  margin-bottom: 28px;
+}
+
+/* Two-column layout */
+.checkout__layout {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 24px;
+  align-items: start;
+}
+
+/* Section cards */
+.checkout__section {
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  margin-bottom: 18px;
+}
+.checkout__section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--gray-800);
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.checkout__section-num {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: var(--maroon-700);
+  color: white;
+  font-size: 12px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Form grids */
+.checkout__form-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.checkout__form-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+
+/* Payment options */
+.checkout__payment-list { display: flex; flex-direction: column; gap: 2px; }
+.checkout__payment-option {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.15s;
+  border: 1.5px solid transparent;
+}
+.checkout__payment-option:has(input:checked) {
+  background: var(--cream-50);
+  border-color: var(--maroon-300);
+}
+.checkout__payment-option:hover { background: var(--gray-50); }
+.checkout__payment-option input[type='radio'] {
+  accent-color: var(--maroon-700);
+  width: 15px; height: 15px; flex-shrink: 0;
+}
+.checkout__payment-icon  { font-size: 20px; }
+.checkout__payment-label { font-size: 14px; color: var(--gray-700); flex: 1; }
+.checkout__payment-tag {
+  font-size: 10px; font-weight: 600;
+  background: var(--cream-100);
+  color: var(--maroon-700);
+  padding: 2px 8px; border-radius: 10px;
+}
+
+/* Summary panel */
+.checkout__summary {
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  position: sticky;
+  top: calc(var(--navbar-h) + 12px);
+}
+.checkout__summary-title {
+  font-family: var(--font-serif);
+  font-size: 19px; font-weight: 700;
+  color: var(--maroon-900);
+  margin-bottom: 16px;
+}
+.checkout__summary-items {
+  margin-bottom: 14px;
+  border-bottom: 1px solid var(--gray-100);
+  padding-bottom: 14px;
+}
+.checkout__summary-item {
+  display: flex; align-items: center; gap: 8px; padding: 7px 0;
+}
+.checkout__item-emoji   { font-size: 20px; flex-shrink: 0; }
+.checkout__item-details { flex: 1; min-width: 0; }
+.checkout__item-name    {
+  display: block; font-size: 13px; font-weight: 500;
+  color: var(--gray-800);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.checkout__item-qty   { display: block; font-size: 11px; color: var(--gray-400); margin-top: 1px; }
+.checkout__item-price { font-size: 13px; font-weight: 600; color: var(--maroon-700); flex-shrink: 0; }
+
+.checkout__sum-row {
+  display: flex; justify-content: space-between;
+  font-size: 13px; color: var(--gray-600); padding: 5px 0;
+}
+.checkout__sum-total {
+  display: flex; justify-content: space-between;
+  font-size: 19px; font-weight: 700; color: var(--maroon-900);
+  padding: 12px 0 16px;
+  border-top: 2px solid var(--cream-100);
+  margin-top: 6px;
+}
+
+.checkout__place-btn {
+  width: 100%; padding: 14px;
+  font-size: 15px; border-radius: var(--radius-md);
+  justify-content: center;
+}
+.checkout__terms {
+  font-size: 11px; color: var(--gray-400);
+  text-align: center; margin-top: 10px; line-height: 1.6;
+}
+
+/* Success screen */
+.checkout__success {
+  max-width: 500px; margin: 0 auto;
+  padding: 70px 24px; text-align: center;
+}
+.checkout__success-icon  { font-size: 72px; margin-bottom: 22px; }
+.checkout__success-title {
+  font-family: var(--font-serif);
+  font-size: 30px; font-weight: 700;
+  color: var(--maroon-900); margin-bottom: 12px;
+}
+.checkout__success-sub   {
+  font-size: 15px; color: var(--gray-600);
+  margin-bottom: 24px; line-height: 1.6;
+}
+.checkout__success-info  {
+  background: var(--cream-50);
+  border: 1px solid var(--cream-200);
+  border-radius: var(--radius-md);
+  padding: 18px 20px; margin-bottom: 28px;
+  text-align: left;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.checkout__success-info p  { font-size: 13px; color: var(--gray-600); line-height: 1.5; }
+.checkout__success-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+/* Responsive */
+@media (max-width: 860px) {
+  .checkout__layout {
+    grid-template-columns: 1fr;
+  }
+
+  .checkout__summary {
+    position: static;
+    order: 99; /* Moves it to the bottom */
+    margin-top: 20px;
+  }
+}
+@media (max-width: 639px) {
+  .checkout__container  { padding: 24px 16px; }
+  .checkout__page-title { font-size: 22px; }
+  .checkout__form-2,
+  .checkout__form-3     { grid-template-columns: 1fr; }
+}
+
+/* Delivery charge additions */
+.checkout__free-label   { color: var(--maroon-500); font-weight: 600; }
+.checkout__charge-label { color: var(--gray-700); font-weight: 500; }
+
+.checkout__delivery-info {
+  background: var(--cream-50);
+  border: 1px solid var(--cream-200);
+  border-radius: var(--radius-sm);
+  padding: 9px 13px;
+  font-size: 12px;
+  color: var(--maroon-700);
+  font-weight: 500;
+  margin: 4px 0 8px;
+  text-align: center;
+}
+
+/* GST styles */
+.checkout__gst-row { border-top: 1px dashed var(--cream-200); margin-top: 4px; }
+.checkout__gst-amount { color: var(--maroon-700); font-weight: 600; }
+.checkout__gst-note {
+  font-size: 11px; color: var(--gray-400);
+  text-align: center; margin: -8px 0 10px;
+  font-style: italic;
+}
+
+/* ── Coupon section ── */
+.checkout__coupon-row {
+  display: flex; gap: 10px;
+}
+.checkout__coupon-input {
+  flex: 1;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.checkout__coupon-btn {
+  padding: 0 20px;
+  font-size: 14px; font-weight: 600;
+  white-space: nowrap;
+  border-radius: var(--radius-sm);
+}
+.checkout__coupon-error {
+  font-size: 13px; color: var(--red);
+  margin-top: 8px;
+}
+
+/* Applied coupon */
+.checkout__coupon-applied {
+  display: flex; justify-content: space-between;
+  align-items: center; gap: 12px;
+  padding: 12px 16px;
+  background: #f0fdf4;
+  border: 1.5px solid #86efac;
+  border-radius: var(--radius-sm);
+}
+.checkout__coupon-applied-left { display: flex; align-items: center; gap: 10px; }
+.checkout__coupon-tick {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: #16a34a; color: white;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; flex-shrink: 0;
+}
+.checkout__coupon-code-label { font-size: 14px; font-weight: 700; color: #166534; letter-spacing: 1px; }
+.checkout__coupon-savings     { font-size: 12px; color: #4ade80; margin-top: 2px; font-weight: 500; }
+.checkout__coupon-remove {
+  background: none; border: none;
+  font-size: 12px; color: var(--gray-400);
+  cursor: pointer; font-family: var(--font-sans);
+  font-weight: 500; transition: color 0.18s;
+  white-space: nowrap;
+}
+.checkout__coupon-remove:hover { color: var(--red); }
+
+/* Discount row in summary */
+.checkout__discount-row   { border-top: 1px dashed #86efac; margin-top: 4px; }
+.checkout__discount-amount { color: #16a34a; font-weight: 700; }
+
+/* Savings banner */
+.checkout__savings-banner {
+  background: #f0fdf4;
+  border: 1px solid #86efac;
+  border-radius: var(--radius-sm);
+  padding: 9px 13px;
+  font-size: 13px; font-weight: 600;
+  color: #166534;
+  text-align: center;
+  margin-bottom: 10px;
+}

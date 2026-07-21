@@ -3,20 +3,21 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
-  id        String    @id @default(uuid())
+  id        String     @id @default(uuid())
   name      String
-  email     String    @unique
+  email     String     @unique
   password  String?
-  googleId  String?   @unique
-  role      String    @default("CUSTOMER")
+  googleId  String?    @unique
+  role      String     @default("CUSTOMER")
   phone     String?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
   orders    Order[]
   cartItems CartItem[]
   addresses Address[]
@@ -61,6 +62,9 @@ model Order {
   items          OrderItem[]
   subtotal       Float       @default(0)
   deliveryCharge Float       @default(0)
+  gstEnabled     Boolean     @default(false)
+  gstRate        Float       @default(0)
+  gstAmount      Float       @default(0)
   total          Float
   status         String      @default("PLACED")
   address        String
@@ -119,12 +123,5 @@ model Policy {
   key       String   @unique
   title     String
   content   String
-  updatedAt DateTime @updatedAt
-}
-
-model SiteSetting {
-  id        Int      @id @default(autoincrement())
-  key       String   @unique
-  value     String
   updatedAt DateTime @updatedAt
 }

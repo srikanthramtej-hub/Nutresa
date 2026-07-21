@@ -14,12 +14,22 @@ export class OrdersService {
   ) {}
 
   async createOrder(userId: string, items: any[], address: any, subtotal: number) {
+    // ── Pull delivery + GST settings from the DB — single source of truth ──
     const deliveryCharge = await this.adminService.computeDeliveryCharge(subtotal)
-    const total          = subtotal + deliveryCharge
+    const gst = await this.adminService.computeGstAmount(subtotal)
+    const total = subtotal + deliveryCharge + gst.amount
 
     const order = await this.prisma.order.create({
       data: {
-        userId, subtotal, deliveryCharge, total,
+        userId,
+        subtotal,
+        deliveryCharge,
+        total,
+        // Persist GST on the order itself so it's always accurate later
+        // (track page, re-prints, reports) even if admin changes the rate after.
+        gstEnabled: gst.enabled,
+        gstRate:    gst.rate,
+        gstAmount:  gst.amount,
         address: JSON.stringify(address),
         items: {
           create: items.map(i => ({
@@ -31,8 +41,9 @@ export class OrdersService {
     })
 
     try {
-      await this.mail.sendOrderConfirmation(order.user.email, order)
-      await this.mail.sendAdminOrderNotification(order)
+      // Pass gst settings through so the PDF/email show the same numbers
+      await this.mail.sendOrderConfirmation(order.user.email, order, gst)
+      await this.mail.sendAdminOrderNotification(order, gst)
     } catch (e) {
       console.error('Mail error:', e.message)
     }
@@ -74,6 +85,14 @@ export class OrdersService {
   async getDeliveryCharge(subtotal: number) {
     const { freeDeliveryAbove } = await this.adminService.getDeliverySettings()
     const deliveryCharge        = await this.adminService.computeDeliveryCharge(subtotal)
-    return { deliveryCharge, freeDeliveryAbove, total: subtotal + deliveryCharge }
+    const gst                   = await this.adminService.computeGstAmount(subtotal)
+    return {
+      deliveryCharge,
+      freeDeliveryAbove,
+      gstEnabled: gst.enabled,
+      gstRate:    gst.rate,
+      gstAmount:  gst.amount,
+      total: subtotal + deliveryCharge + gst.amount,
+    }
   }
 }

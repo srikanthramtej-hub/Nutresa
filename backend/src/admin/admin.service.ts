@@ -4,6 +4,8 @@ import { PdfService } from '../pdf/pdf.service'
 
 const DEFAULT_DELIVERY_CHARGE     = 49
 const DEFAULT_FREE_DELIVERY_ABOVE = 500
+const DEFAULT_GST_ENABLED         = false
+const DEFAULT_GST_RATE            = 5
 
 @Injectable()
 export class AdminService {
@@ -50,25 +52,15 @@ export class AdminService {
     if (!order) throw new InternalServerErrorException('Order not found')
     return this.pdf.generateInvoice(order)
   }
+
   async getAdminInvoicePdf(orderId: string): Promise<Buffer> {
-  const order = await this.prisma.order.findUnique({
-    where: { id: orderId },
-    include: {
-      user: true,
-      items: {
-        include: {
-          product: true,
-        },
-      },
-    },
-  })
-
-  if (!order) {
-    throw new InternalServerErrorException('Order not found')
+    const order = await this.prisma.order.findUnique({
+      where: { id: orderId },
+      include: { user: true, items: { include: { product: true } } },
+    })
+    if (!order) throw new InternalServerErrorException('Order not found')
+    return this.pdf.generateAdminInvoice(order)
   }
-
-  return this.pdf.generateAdminInvoice(order)
-}
 
   async getAllProducts() {
     return this.prisma.product.findMany({ include: { weightOptions: true }, orderBy: { createdAt: 'desc' } })
@@ -174,16 +166,16 @@ export class AdminService {
       where: { key: this.DELIVERY_SETTINGS_KEY },
     })
     if (!record) {
-      return { deliveryCharge: 49, freeDeliveryAbove: 500 }
+      return { deliveryCharge: DEFAULT_DELIVERY_CHARGE, freeDeliveryAbove: DEFAULT_FREE_DELIVERY_ABOVE }
     }
     try {
       const parsed = JSON.parse(record.content)
       return {
-        deliveryCharge:    typeof parsed.deliveryCharge    === 'number' ? parsed.deliveryCharge    : 49,
-        freeDeliveryAbove: typeof parsed.freeDeliveryAbove === 'number' ? parsed.freeDeliveryAbove : 500,
+        deliveryCharge:    typeof parsed.deliveryCharge    === 'number' ? parsed.deliveryCharge    : DEFAULT_DELIVERY_CHARGE,
+        freeDeliveryAbove: typeof parsed.freeDeliveryAbove === 'number' ? parsed.freeDeliveryAbove : DEFAULT_FREE_DELIVERY_ABOVE,
       }
     } catch {
-      return { deliveryCharge: 49, freeDeliveryAbove: 500 }
+      return { deliveryCharge: DEFAULT_DELIVERY_CHARGE, freeDeliveryAbove: DEFAULT_FREE_DELIVERY_ABOVE }
     }
   }
 
@@ -201,5 +193,45 @@ export class AdminService {
     const { deliveryCharge, freeDeliveryAbove } = await this.getDeliverySettings()
     return subtotal >= freeDeliveryAbove ? 0 : deliveryCharge
   }
-}
 
+  // ── GST settings ──────────────────────────────────────────────────────────
+  // Stored the same way as delivery settings — as a Policy row, so no schema
+  // migration is needed. This is now the SINGLE SOURCE OF TRUTH for GST,
+  // replacing the old frontend-only localStorage version.
+
+  private readonly GST_SETTINGS_KEY = '__gst_settings'
+
+  async getGstSettings(): Promise<{ enabled: boolean; rate: number }> {
+    const record = await this.prisma.policy.findUnique({
+      where: { key: this.GST_SETTINGS_KEY },
+    })
+    if (!record) {
+      return { enabled: DEFAULT_GST_ENABLED, rate: DEFAULT_GST_RATE }
+    }
+    try {
+      const parsed = JSON.parse(record.content)
+      return {
+        enabled: typeof parsed.enabled === 'boolean' ? parsed.enabled : DEFAULT_GST_ENABLED,
+        rate:    typeof parsed.rate    === 'number'  ? parsed.rate    : DEFAULT_GST_RATE,
+      }
+    } catch {
+      return { enabled: DEFAULT_GST_ENABLED, rate: DEFAULT_GST_RATE }
+    }
+  }
+
+  async updateGstSettings(enabled: boolean, rate: number) {
+    const content = JSON.stringify({ enabled, rate })
+    await this.prisma.policy.upsert({
+      where:  { key: this.GST_SETTINGS_KEY },
+      update: { content },
+      create: { key: this.GST_SETTINGS_KEY, title: 'GST Settings', content },
+    })
+    return { enabled, rate }
+  }
+
+  async computeGstAmount(subtotal: number): Promise<{ enabled: boolean; rate: number; amount: number }> {
+    const { enabled, rate } = await this.getGstSettings()
+    const amount = enabled ? Math.round(subtotal * rate / 100) : 0
+    return { enabled, rate, amount }
+  }
+}

@@ -74,18 +74,37 @@ export class PdfService {
 
       // ── Totals
       rowY += 10
-      const totalsX      = 360
-      const subtotal     = order.subtotal ?? order.items.reduce((s: number, i: any) => s + i.price * i.qty, 0)
-      const delivery     = order.deliveryCharge ?? 0
-      const total        = order.total ?? subtotal + delivery
+      const totalsX  = 360
+      const subtotal = order.subtotal ?? order.items.reduce((s: number, i: any) => s + i.price * i.qty, 0)
+      const delivery = order.deliveryCharge ?? 0
+
+      // GST — persisted on the order at creation time (gstEnabled / gstRate / gstAmount).
+      // Falls back to 0 for any older orders placed before GST was added.
+      const gstEnabled = order.gstEnabled ?? false
+      const gstRate    = order.gstRate    ?? 0
+      const gstAmount  = order.gstAmount  ?? 0
+
+      const total = order.total ?? subtotal + delivery + gstAmount
 
       doc.fillColor('#555').font('Helvetica').fontSize(9)
-      doc.text('Subtotal:',       totalsX, rowY)
+      doc.text('Subtotal:', totalsX, rowY)
       doc.text(`₹${subtotal.toFixed(2)}`, totalsX + 100, rowY, { width: 85, align: 'right' })
       rowY += 16
+
       doc.text('Delivery Charge:', totalsX, rowY)
       doc.fillColor(delivery === 0 ? 'green' : '#555')
       doc.text(delivery === 0 ? 'FREE' : `₹${delivery.toFixed(2)}`, totalsX + 100, rowY, { width: 85, align: 'right' })
+      doc.fillColor('#555')
+      rowY += 16
+
+      if (gstEnabled && gstAmount > 0) {
+        doc.fillColor(brandColor).font('Helvetica-Bold')
+        doc.text(`GST (${gstRate}%):`, totalsX, rowY)
+        doc.text(`₹${gstAmount.toFixed(2)}`, totalsX + 100, rowY, { width: 85, align: 'right' })
+        doc.fillColor('#555').font('Helvetica')
+        rowY += 16
+      }
+
       rowY += 6
       doc.moveTo(totalsX, rowY).lineTo(545, rowY).strokeColor(brandColor).lineWidth(0.8).stroke()
       rowY += 8
@@ -108,66 +127,60 @@ export class PdfService {
       doc.end()
     })
   }
+
   async generateAdminInvoice(order: any): Promise<Buffer> {
-  const PDFDocument = require('pdfkit')
+    return new Promise((resolve, reject) => {
+      const doc = new PDFDocument({ margin: 40, size: 'A4' })
+      const buffers: Buffer[] = []
 
-  return new Promise((resolve, reject) => {
-    const doc = new PDFDocument({
-      margin: 40,
-      size: 'A4',
+      doc.on('data', buffers.push.bind(buffers))
+      doc.on('end', () => resolve(Buffer.concat(buffers)))
+      doc.on('error', reject)
+
+      doc.fontSize(22).text('ADMIN COPY', { align: 'center' })
+      doc.moveDown()
+
+      doc.fontSize(12)
+      doc.text(`Order ID: ${order.id}`)
+      doc.text(`Order Status: ${order.status}`)
+      doc.text(`Customer Name: ${order.user?.name || '-'}`)
+      doc.text(`Customer Email: ${order.user?.email || '-'}`)
+      doc.text(`Customer Phone: ${order.user?.phone || '-'}`)
+
+      doc.moveDown()
+      doc.fontSize(16).text('Products')
+      doc.moveDown(0.5)
+
+      const subtotal = order.subtotal ?? order.items.reduce((s: number, i: any) => s + i.price * i.qty, 0)
+
+      order.items.forEach((item: any) => {
+        const name  = item.product?.name || item.productName || 'Product'
+        const qty   = item.qty ?? item.quantity ?? 0
+        const price = Number(item.price || 0)
+
+        doc.fontSize(11)
+        doc.text(`${name}  |  Qty: ${qty}  |  ₹${price}`)
+      })
+
+      doc.moveDown()
+
+      const delivery   = order.deliveryCharge ?? 0
+      const gstEnabled = order.gstEnabled ?? false
+      const gstRate    = order.gstRate    ?? 0
+      const gstAmount  = order.gstAmount  ?? 0
+      const total      = order.total ?? subtotal + delivery + gstAmount
+
+      doc.fontSize(12)
+      doc.text(`Subtotal: ₹${subtotal.toFixed(2)}`)
+      doc.text(`Delivery Charge: ${delivery === 0 ? 'FREE' : '₹' + delivery.toFixed(2)}`)
+      if (gstEnabled && gstAmount > 0) {
+        doc.text(`GST (${gstRate}%): ₹${gstAmount.toFixed(2)}`)
+      }
+
+      doc.moveDown(0.5)
+      doc.fontSize(14).text(`Grand Total: ₹${total.toFixed(2)}`)
+
+      doc.end()
     })
-
-    const buffers: Buffer[] = []
-
-    doc.on('data', buffers.push.bind(buffers))
-
-    doc.on('end', () => {
-      resolve(Buffer.concat(buffers))
-    })
-
-    doc.on('error', reject)
-
-    doc.fontSize(22)
-      .text('ADMIN COPY', { align: 'center' })
-
-    doc.moveDown()
-
-    doc.fontSize(12)
-
-    doc.text(`Order ID: ${order.id}`)
-    doc.text(`Order Status: ${order.status}`)
-    doc.text(`Customer Name: ${order.user?.name || '-'}`)
-    doc.text(`Customer Email: ${order.user?.email || '-'}`)
-    doc.text(`Customer Phone: ${order.user?.phone || '-'}`)
-
-    doc.moveDown()
-
-    doc.fontSize(16)
-    doc.text('Products')
-
-    doc.moveDown(0.5)
-
-    order.items.forEach((item: any) => {
-      const name =
-        item.product?.name ||
-        item.productName ||
-        'Product'
-
-      const qty = item.quantity || 0
-      const price = Number(item.price || 0)
-
-      doc.fontSize(11)
-      doc.text(
-        `${name}  |  Qty: ${qty}  |  ₹${price}`
-      )
-    })
-
-    doc.moveDown()
-
-    doc.fontSize(14)
-      .text(`Grand Total: ₹${order.total}`)
-
-    doc.end()
-  })
-}
+  }
 }

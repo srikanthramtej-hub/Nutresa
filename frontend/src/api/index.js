@@ -48,8 +48,18 @@ export const cartAPI = {
 
 // ── Orders ──
 export const ordersAPI = {
-  create: (items, address, total) => api.post('/orders', { items, address, total }),
+  create: (items, address, subtotal, deliveryCharge, discount = 0, gstAmount = 0) =>
+    api.post('/orders', {
+      items,
+      address,
+      subtotal,
+      deliveryCharge,
+      discount,
+      gstAmount,
+    }),
+
   getMy: () => api.get('/orders/my'),
+
   getOne: (id) => api.get(`/orders/${id}`),
 }
 

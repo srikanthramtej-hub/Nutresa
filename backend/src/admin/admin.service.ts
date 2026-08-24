@@ -2,17 +2,17 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common'
 import { PrismaService } from '../prisma/prisma.service'
 import { PdfService } from '../pdf/pdf.service'
 
-const DEFAULT_DELIVERY_CHARGE     = 49
+const DEFAULT_DELIVERY_CHARGE = 49
 const DEFAULT_FREE_DELIVERY_ABOVE = 500
-const DEFAULT_GST_ENABLED         = false
-const DEFAULT_GST_RATE            = 5
+const DEFAULT_GST_ENABLED = false
+const DEFAULT_GST_RATE = 5
 
 @Injectable()
 export class AdminService {
   constructor(
     private prisma: PrismaService,
     private pdf: PdfService,
-  ) {}
+  ) { }
 
   async getDashboardStats() {
     const [totalOrders, totalUsers, pendingOrders] = await Promise.all([
@@ -20,9 +20,9 @@ export class AdminService {
       this.prisma.user.count({ where: { role: 'CUSTOMER' } }),
       this.prisma.order.count({ where: { status: 'PLACED' } }),
     ])
-    const revenueResult    = await this.prisma.order.aggregate({ _sum: { total: true } })
+    const revenueResult = await this.prisma.order.aggregate({ _sum: { total: true } })
     const lowStockProducts = await this.prisma.product.findMany({
-      where:  { stock: { lte: 50 } },
+      where: { stock: { lte: 50 } },
       select: { id: true, name: true, stock: true, imageUrl: true, imageUrls: true },
     })
     return { totalOrders, totalUsers, pendingOrders, totalRevenue: revenueResult._sum.total || 0, lowStockProducts }
@@ -37,8 +37,8 @@ export class AdminService {
 
   async updateOrderStatus(orderId: string, status: string) {
     return this.prisma.order.update({
-      where:   { id: orderId },
-      data:    { status },
+      where: { id: orderId },
+      data: { status },
       include: { user: true, items: { include: { product: true } } },
     })
   }
@@ -46,7 +46,7 @@ export class AdminService {
   // Duplicate bill — generates the same PDF as the customer
   async getOrderInvoicePdf(orderId: string): Promise<Buffer> {
     const order = await this.prisma.order.findUnique({
-      where:   { id: orderId },
+      where: { id: orderId },
       include: { user: true, items: { include: { product: true } } },
     })
     if (!order) throw new InternalServerErrorException('Order not found')
@@ -78,18 +78,18 @@ export class AdminService {
     const { weightOptions, tags, existingImages, ...productData } = data
     const product = await this.prisma.product.create({
       data: {
-        name:        String(productData.name),
-        category:    String(productData.category),
-        basePrice:   parseFloat(productData.basePrice),
+        name: String(productData.name),
+        category: String(productData.category),
+        basePrice: parseFloat(productData.basePrice),
         description: String(productData.description),
-        stock:       parseInt(productData.stock),
-        origin:      productData.origin    ? String(productData.origin)    : null,
-        shelfLife:   productData.shelfLife ? String(productData.shelfLife) : null,
-        isNew:       productData.isNew === true || productData.isNew === 'true',
-        isActive:    productData.isActive !== 'false',
-        tags:        JSON.stringify(this.parseTags(tags)),
-        imageUrl:    imageUrls[0] || null,
-        imageUrls:   JSON.stringify(imageUrls),
+        stock: parseInt(productData.stock),
+        origin: productData.origin ? String(productData.origin) : null,
+        shelfLife: productData.shelfLife ? String(productData.shelfLife) : null,
+        isNew: productData.isNew === true || productData.isNew === 'true',
+        isActive: productData.isActive !== 'false',
+        tags: JSON.stringify(this.parseTags(tags)),
+        imageUrl: imageUrls[0] || null,
+        imageUrls: JSON.stringify(imageUrls),
       },
     })
     if (Array.isArray(weightOptions) && weightOptions.length > 0) {
@@ -106,16 +106,16 @@ export class AdminService {
     const { weightOptions, tags, existingImages: _ei, ...productData } = data
     const finalImages = [...existingImages, ...(newImageUrls || [])].slice(0, 5)
     const updateData: any = {}
-    if (productData.name        !== undefined) updateData.name        = String(productData.name)
-    if (productData.category    !== undefined) updateData.category    = String(productData.category)
+    if (productData.name !== undefined) updateData.name = String(productData.name)
+    if (productData.category !== undefined) updateData.category = String(productData.category)
     if (productData.description !== undefined) updateData.description = String(productData.description)
-    if (productData.origin      !== undefined) updateData.origin      = productData.origin ? String(productData.origin) : null
-    if (productData.shelfLife   !== undefined) updateData.shelfLife   = productData.shelfLife ? String(productData.shelfLife) : null
-    if (productData.isNew       !== undefined) updateData.isNew       = productData.isNew === true || productData.isNew === 'true'
-    if (productData.isActive    !== undefined) updateData.isActive    = productData.isActive !== 'false'
-    if (productData.basePrice   !== undefined) { const bp = parseFloat(productData.basePrice); if (!isNaN(bp)) updateData.basePrice = bp }
-    if (productData.stock       !== undefined) { const st = parseInt(productData.stock);       if (!isNaN(st)) updateData.stock = st }
-    if (tags                    !== undefined) updateData.tags = JSON.stringify(this.parseTags(tags))
+    if (productData.origin !== undefined) updateData.origin = productData.origin ? String(productData.origin) : null
+    if (productData.shelfLife !== undefined) updateData.shelfLife = productData.shelfLife ? String(productData.shelfLife) : null
+    if (productData.isNew !== undefined) updateData.isNew = productData.isNew === true || productData.isNew === 'true'
+    if (productData.isActive !== undefined) updateData.isActive = productData.isActive !== 'false'
+    if (productData.basePrice !== undefined) { const bp = parseFloat(productData.basePrice); if (!isNaN(bp)) updateData.basePrice = bp }
+    if (productData.stock !== undefined) { const st = parseInt(productData.stock); if (!isNaN(st)) updateData.stock = st }
+    if (tags !== undefined) updateData.tags = JSON.stringify(this.parseTags(tags))
     if (newImageUrls !== undefined || existingImages.length > 0) {
       updateData.imageUrl = finalImages[0] || null; updateData.imageUrls = JSON.stringify(finalImages)
     }
@@ -142,7 +142,7 @@ export class AdminService {
 
   async getAllCustomers() {
     return this.prisma.user.findMany({
-      where:   { role: 'CUSTOMER' },
+      where: { role: 'CUSTOMER' },
       include: { _count: { select: { orders: true } }, orders: { select: { total: true } } },
       orderBy: { createdAt: 'desc' },
     })
@@ -161,38 +161,99 @@ export class AdminService {
 
   private readonly DELIVERY_SETTINGS_KEY = '__delivery_settings'
 
-  async getDeliverySettings(): Promise<{ deliveryCharge: number; freeDeliveryAbove: number }> {
+  async getDeliverySettings(): Promise<{
+    lowDeliveryCharge: number
+    deliveryCharge: number
+    freeDeliveryAbove: number
+  }> {
     const record = await this.prisma.policy.findUnique({
       where: { key: this.DELIVERY_SETTINGS_KEY },
     })
+
     if (!record) {
-      return { deliveryCharge: DEFAULT_DELIVERY_CHARGE, freeDeliveryAbove: DEFAULT_FREE_DELIVERY_ABOVE }
+      return {
+        lowDeliveryCharge: 79,
+        deliveryCharge: 49,
+        freeDeliveryAbove: 999,
+      }
     }
+
     try {
       const parsed = JSON.parse(record.content)
+
       return {
-        deliveryCharge:    typeof parsed.deliveryCharge    === 'number' ? parsed.deliveryCharge    : DEFAULT_DELIVERY_CHARGE,
-        freeDeliveryAbove: typeof parsed.freeDeliveryAbove === 'number' ? parsed.freeDeliveryAbove : DEFAULT_FREE_DELIVERY_ABOVE,
+        lowDeliveryCharge:
+          typeof parsed.lowDeliveryCharge === 'number'
+            ? parsed.lowDeliveryCharge
+            : 79,
+
+        deliveryCharge:
+          typeof parsed.deliveryCharge === 'number'
+            ? parsed.deliveryCharge
+            : 49,
+
+        freeDeliveryAbove:
+          typeof parsed.freeDeliveryAbove === 'number'
+            ? parsed.freeDeliveryAbove
+            : 999,
       }
     } catch {
-      return { deliveryCharge: DEFAULT_DELIVERY_CHARGE, freeDeliveryAbove: DEFAULT_FREE_DELIVERY_ABOVE }
+      return {
+        lowDeliveryCharge: 79,
+        deliveryCharge: 49,
+        freeDeliveryAbove: 999,
+      }
     }
   }
 
-  async updateDeliverySettings(deliveryCharge: number, freeDeliveryAbove: number) {
-    const content = JSON.stringify({ deliveryCharge, freeDeliveryAbove })
-    await this.prisma.policy.upsert({
-      where:  { key: this.DELIVERY_SETTINGS_KEY },
-      update: { content },
-      create: { key: this.DELIVERY_SETTINGS_KEY, title: 'Delivery Settings', content },
+  async updateDeliverySettings(
+    lowDeliveryCharge: number,
+    deliveryCharge: number,
+    freeDeliveryAbove: number,
+  ) {
+    const content = JSON.stringify({
+      lowDeliveryCharge,
+      deliveryCharge,
+      freeDeliveryAbove,
     })
-    return { deliveryCharge, freeDeliveryAbove }
+
+    await this.prisma.policy.upsert({
+      where: {
+        key: this.DELIVERY_SETTINGS_KEY,
+      },
+
+      update: {
+        content,
+      },
+
+      create: {
+        key: this.DELIVERY_SETTINGS_KEY,
+        title: 'Delivery Settings',
+        content,
+      },
+    })
+
+    return {
+      lowDeliveryCharge,
+      deliveryCharge,
+      freeDeliveryAbove,
+    }
   }
 
   async computeDeliveryCharge(subtotal: number): Promise<number> {
-    const { deliveryCharge, freeDeliveryAbove } = await this.getDeliverySettings()
-    return subtotal >= freeDeliveryAbove ? 0 : deliveryCharge
+  const { lowDeliveryCharge, deliveryCharge, freeDeliveryAbove,
+  } = await this.getDeliverySettings()
+
+  if (subtotal >= freeDeliveryAbove) {
+    return 0
   }
+
+  if (subtotal >= 500) {
+    return deliveryCharge
+  }
+
+  return lowDeliveryCharge
+}
 
   // ── GST settings ──────────────────────────────────────────────────────────
   // Stored the same way as delivery settings — as a Policy row, so no schema
@@ -212,7 +273,7 @@ export class AdminService {
       const parsed = JSON.parse(record.content)
       return {
         enabled: typeof parsed.enabled === 'boolean' ? parsed.enabled : DEFAULT_GST_ENABLED,
-        rate:    typeof parsed.rate    === 'number'  ? parsed.rate    : DEFAULT_GST_RATE,
+        rate: typeof parsed.rate === 'number' ? parsed.rate : DEFAULT_GST_RATE,
       }
     } catch {
       return { enabled: DEFAULT_GST_ENABLED, rate: DEFAULT_GST_RATE }
@@ -222,7 +283,7 @@ export class AdminService {
   async updateGstSettings(enabled: boolean, rate: number) {
     const content = JSON.stringify({ enabled, rate })
     await this.prisma.policy.upsert({
-      where:  { key: this.GST_SETTINGS_KEY },
+      where: { key: this.GST_SETTINGS_KEY },
       update: { content },
       create: { key: this.GST_SETTINGS_KEY, title: 'GST Settings', content },
     })

@@ -13,18 +13,15 @@ export class OrdersService {
     private adminService: AdminService,
   ) {}
 
-  async createOrder(userId: string, items: any[], address: any, subtotal: number) {
+  async createOrder(userId: string, items: any[], address: any, totalFromFrontend: number) {
 
-    // ── Step 1: Validate stock for every item BEFORE creating the order ──
+    // ── Step 1: Validate stock ──
     for (const item of items) {
       const product = await this.prisma.product.findUnique({
-        where: { id: item.productId },
+        where:  { id: item.productId },
         select: { id: true, name: true, stock: true },
       })
-
-      if (!product) {
-        throw new BadRequestException(`Product #${item.productId} not found`)
-      }
+      if (!product) throw new BadRequestException(`Product #${item.productId} not found`)
       if (product.stock < item.qty) {
         throw new BadRequestException(
           `"${product.name}" only has ${product.stock} units in stock but you ordered ${item.qty}`
@@ -32,9 +29,11 @@ export class OrdersService {
       }
     }
 
-    // ── Step 2: Compute delivery + GST ──
+    // ── Step 2: Compute totals server-side ──
+    const subtotal       = items.reduce((s, i) => s + i.price * i.qty, 0)
     const deliveryCharge = await this.adminService.computeDeliveryCharge(subtotal)
     const gst            = await this.adminService.computeGstAmount(subtotal)
+    // Total = subtotal + delivery + gst (NOT totalFromFrontend — always compute server-side)
     const total          = subtotal + deliveryCharge + gst.amount
 
     // ── Step 3: Create the order ──
@@ -60,7 +59,7 @@ export class OrdersService {
       include: { user: true, items: { include: { product: true } } },
     })
 
-    // ── Step 4: Decrement stock for each ordered product ──
+    // ── Step 4: Decrement stock ──
     for (const item of items) {
       await this.prisma.product.update({
         where: { id: item.productId },
@@ -68,7 +67,7 @@ export class OrdersService {
       })
     }
 
-    // ── Step 5: Send confirmation emails ──
+    // ── Step 5: Send emails ──
     try {
       await this.mail.sendOrderConfirmation(order.user.email, order, gst)
       await this.mail.sendAdminOrderNotification(order, gst)
@@ -104,7 +103,7 @@ export class OrdersService {
         items: { include: { product: true } },
       },
     })
-    if (!order) throw new NotFoundException('Order not found. Please check your Order ID and try again.')
+    if (!order) throw new NotFoundException('Order not found. Please check your Order ID.')
     return order
   }
 

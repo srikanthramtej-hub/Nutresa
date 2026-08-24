@@ -15,24 +15,28 @@ const uploadDir = join(process.cwd(), 'uploads', 'products')
 if (!existsSync(uploadDir)) mkdirSync(uploadDir, { recursive: true })
 
 const productImageStorage = diskStorage({
-  destination: (req, file, cb) => { cb(null, uploadDir) },
-  filename:    (req, file, cb) => { cb(null, `product-${Date.now()}-${Math.round(Math.random() * 1e6)}${extname(file.originalname)}`) },
+  destination: (req, file, cb) => cb(null, uploadDir),
+  filename: (req, file, cb) => {
+    const unique = Date.now() + '-' + Math.round(Math.random() * 1e6)
+    cb(null, `product-${unique}${extname(file.originalname)}`)
+  },
 })
+
 const imageFilter = (req: any, file: any, cb: any) => {
-  if (!file.mimetype.startsWith('image/')) return cb(new Error('Only image files are allowed'), false)
+  if (!file.mimetype.startsWith('image/')) return cb(new Error('Only image files allowed'), false)
   cb(null, true)
 }
 
 @Controller('admin')
 @UseGuards(JwtAuthGuard, AdminGuard)
 export class AdminController {
-  constructor(private admin: AdminService) {}
+  constructor(private admin: AdminService) { }
 
+  // ── Dashboard ──
   @Get('dashboard')
   getDashboard() { return this.admin.getDashboardStats() }
 
   // ── Orders ──
-
   @Get('orders')
   getAllOrders() { return this.admin.getAllOrders() }
 
@@ -41,78 +45,49 @@ export class AdminController {
     return this.admin.updateOrderStatus(id, body.status)
   }
 
-  
-
-  // Duplicate bill — admin downloads the same PDF invoice as the customer
- @Get('orders/:id/invoice')
-async downloadInvoice(
-  @Param('id') id: string,
-  @Res() res: any,
-) {
-  try {
-    const pdfBuffer = await this.admin.getOrderInvoicePdf(id)
-
-    res.setHeader('Content-Type', 'application/pdf')
-    res.setHeader(
-      'Content-Disposition',
-      `attachment; filename=invoice_${id}.pdf`,
-    )
-
-    res.send(pdfBuffer)
-  } catch (error) {
-    res.status(404).json({
-      message: 'Order not found',
-    })
-  }
-}
-
   @Get('orders/:id/label')
   async downloadLabel(@Param('id') id: string, @Res() res: any) {
     const orders = await this.admin.getAllOrders()
-    const order  = orders.find(o => o.id === id)
+    const order = orders.find(o => o.id === id)
     if (!order) return res.status(404).json({ message: 'Order not found' })
+    const label = `NUTRESA SHIPPING LABEL\nOrder: ${order.id}\nCustomer: ${order.user.name}\nTotal: ₹${order.total}`
     res.setHeader('Content-Type', 'text/plain')
     res.setHeader('Content-Disposition', `attachment; filename=label_${id}.txt`)
-    res.send(`NUTRESA SHIPPING LABEL\nOrder: ${order.id}\nCustomer: ${order.user.name}\nTotal: ₹${order.total}`)
+    res.send(label)
   }
 
   // ── Products ──
-
   @Get('products')
   getAllProducts() { return this.admin.getAllProducts() }
 
   @Post('products')
   @UseInterceptors(FilesInterceptor('images', 5, { storage: productImageStorage, fileFilter: imageFilter, limits: { fileSize: 5 * 1024 * 1024 } }))
   async createProduct(@UploadedFiles() files: Express.Multer.File[], @Body() body: any) {
-    try {
-      const imageUrls = (files || []).map(f => `/uploads/products/${f.filename}`)
-      if (body.weightOptions && typeof body.weightOptions === 'string') {
-        try { body.weightOptions = JSON.parse(body.weightOptions) } catch { body.weightOptions = [] }
-      }
-      if (body.tags && typeof body.tags === 'string') {
-        try { body.tags = JSON.parse(body.tags) } catch { body.tags = body.tags.split(',').map((t: string) => t.trim()).filter(Boolean) }
-      }
-      body.isNew = body.isNew === 'true' || body.isNew === true
-      body.isActive = body.isActive !== 'false'
-      return await this.admin.createProduct(body, imageUrls)
-    } catch (err) { console.error('Create product error:', err); throw err }
+    const imageUrls = (files || []).map(f => `/uploads/products/${f.filename}`)
+    if (body.weightOptions && typeof body.weightOptions === 'string') {
+      try { body.weightOptions = JSON.parse(body.weightOptions) } catch { body.weightOptions = [] }
+    }
+    if (body.tags && typeof body.tags === 'string') {
+      try { body.tags = JSON.parse(body.tags) } catch { body.tags = body.tags.split(',').map((t: string) => t.trim()).filter(Boolean) }
+    }
+    body.isNew = body.isNew === 'true' || body.isNew === true
+    body.isActive = body.isActive !== 'false'
+    return this.admin.createProduct(body, imageUrls)
   }
 
   @Put('products/:id')
   @UseInterceptors(FilesInterceptor('images', 5, { storage: productImageStorage, fileFilter: imageFilter, limits: { fileSize: 5 * 1024 * 1024 } }))
   async updateProduct(@Param('id', ParseIntPipe) id: number, @UploadedFiles() files: Express.Multer.File[], @Body() body: any) {
-    try {
-      const newImageUrls = files && files.length > 0 ? files.map(f => `/uploads/products/${f.filename}`) : undefined
-      if (body.weightOptions && typeof body.weightOptions === 'string') {
-        try { body.weightOptions = JSON.parse(body.weightOptions) } catch { body.weightOptions = [] }
-      }
-      if (body.tags && typeof body.tags === 'string') {
-        try { body.tags = JSON.parse(body.tags) } catch { body.tags = body.tags.split(',').map((t: string) => t.trim()).filter(Boolean) }
-      }
-      if (body.isNew !== undefined) body.isNew = body.isNew === 'true' || body.isNew === true
-      const existingImages = body.existingImages ? body.existingImages.split(',').filter(Boolean) : []
-      return await this.admin.updateProduct(id, body, newImageUrls, existingImages)
-    } catch (err) { console.error('Update product error:', err); throw err }
+    const newImageUrls = files && files.length > 0 ? files.map(f => `/uploads/products/${f.filename}`) : undefined
+    if (body.weightOptions && typeof body.weightOptions === 'string') {
+      try { body.weightOptions = JSON.parse(body.weightOptions) } catch { body.weightOptions = [] }
+    }
+    if (body.tags && typeof body.tags === 'string') {
+      try { body.tags = JSON.parse(body.tags) } catch { body.tags = body.tags.split(',').map((t: string) => t.trim()).filter(Boolean) }
+    }
+    if (body.isNew !== undefined) body.isNew = body.isNew === 'true' || body.isNew === true
+    const existingImages = body.existingImages ? body.existingImages.split(',').filter(Boolean) : []
+    return this.admin.updateProduct(id, body, newImageUrls, existingImages)
   }
 
   @Patch('products/:id/stock')
@@ -121,10 +96,11 @@ async downloadInvoice(
   }
 
   @Delete('products/:id')
-  deleteProduct(@Param('id', ParseIntPipe) id: number) { return this.admin.deleteProduct(id) }
+  deleteProduct(@Param('id', ParseIntPipe) id: number) {
+    return this.admin.deleteProduct(id)
+  }
 
   // ── Customers ──
-
   @Get('customers')
   getAllCustomers() { return this.admin.getAllCustomers() }
 
@@ -132,50 +108,38 @@ async downloadInvoice(
   async exportCSV(@Res() res: any) {
     const csv = await this.admin.getCustomersCSV()
     res.setHeader('Content-Type', 'text/csv')
-    res.setHeader('Content-Disposition', 'attachment; filename=nutrinest_customers.csv')
+    res.setHeader('Content-Disposition', 'attachment; filename=nutresa_customers.csv')
     res.send(csv)
   }
 
-  // ── Delivery charge settings ──
+  // ── GST Settings ──
+  @Get('gst-settings')
+  getGstSettings() { return this.admin.getGstSettings() }
 
-  @Get('settings/delivery')
-  getDeliverySettings() { return this.admin.getDeliverySettings() }
-
-  @Put('settings/delivery')
-  updateDeliverySettings(@Body() body: { deliveryCharge: number; freeDeliveryAbove: number }) {
-    return this.admin.updateDeliverySettings(Number(body.deliveryCharge), Number(body.freeDeliveryAbove))
+  @Patch('gst-settings')
+  updateGstSettings(@Body() body: { enabled: boolean; rate: number }) {
+    return this.admin.updateGstSettings(body.enabled, body.rate)
   }
 
-  @Get('orders/:id/customer-invoice')
-async downloadCustomerInvoice(
-  @Param('id') id: string,
-  @Res() res: any,
-) {
-  const pdf = await this.admin.getOrderInvoicePdf(id)
+  // ── Delivery Settings ──
+  @Get('delivery-settings')
+  getDeliverySettings() {
+    return this.admin.getDeliverySettings()
+  }
 
-  res.setHeader('Content-Type', 'application/pdf')
-  res.setHeader(
-    'Content-Disposition',
-    `attachment; filename=customer_invoice_${id}.pdf`,
-  )
-
-  res.send(pdf)
-}
-
-@Get('orders/:id/admin-invoice')
-async downloadAdminInvoice(
-  @Param('id') id: string,
-  @Res() res: any,
-) {
-  const pdf = await this.admin.getAdminInvoicePdf(id)
-
-  res.setHeader('Content-Type', 'application/pdf')
-  res.setHeader(
-    'Content-Disposition',
-    `attachment; filename=admin_invoice_${id}.pdf`,
-  )
-
-  res.send(pdf)
-}
-
+  @Patch('delivery-settings')
+  updateDeliverySettings(
+    @Body()
+    body: {
+      lowDeliveryCharge: number
+      deliveryCharge: number
+      freeDeliveryAbove: number
+    },
+  ) {
+    return this.admin.updateDeliverySettings(
+      body.lowDeliveryCharge,
+      body.deliveryCharge,
+      body.freeDeliveryAbove,
+    )
+  }
 }

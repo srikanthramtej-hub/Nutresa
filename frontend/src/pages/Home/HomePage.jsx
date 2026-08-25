@@ -10,23 +10,23 @@ import './HomePage.css'
 gsap.registerPlugin(ScrollTrigger)
 
 const TRAIL_IMGS = [
-  '/dryfruits/almond.png','/dryfruits/cashew.png','/dryfruits/dates.png',
-  '/dryfruits/fig.png','/dryfruits/pistachio.png','/dryfruits/walnut.png','/dryfruits/raisins.png',
+  '/dryfruits/almond.png', '/dryfruits/cashew.png', '/dryfruits/dates.png',
+  '/dryfruits/fig.png', '/dryfruits/pistachio.png', '/dryfruits/walnut.png', '/dryfruits/raisins.png',
 ]
 
 const CATEGORIES = [
-  { name: 'Almonds',    img: '/dryfruits/almond.png',    note: 'California · Organic' },
-  { name: 'Cashews',    img: '/dryfruits/cashew.png',    note: 'Vietnam · Grade W320' },
+  { name: 'Almonds', img: '/dryfruits/almond.png', note: 'California · Organic' },
+  { name: 'Cashews', img: '/dryfruits/cashew.png', note: 'Vietnam · Grade W320' },
   { name: 'Pistachios', img: '/dryfruits/pistachio.png', note: 'Iran · Long grain' },
-  { name: 'Walnuts',    img: '/dryfruits/walnut.png',    note: 'Kashmiri · Light halves' },
-  { name: 'Dates',      img: '/dryfruits/dates.png',     note: 'Medjool · Jumbo' },
-  { name: 'Figs',       img: '/dryfruits/fig.png',       note: 'Turkish · Sun-dried' },
+  { name: 'Walnuts', img: '/dryfruits/walnut.png', note: 'Kashmiri · Light halves' },
+  { name: 'Dates', img: '/dryfruits/dates.png', note: 'Medjool · Jumbo' },
+  { name: 'Figs', img: '/dryfruits/fig.png', note: 'Turkish · Sun-dried' },
 ]
 
 const PILLARS = [
-  { icon: '🌿', title: '100% Natural',  body: 'No preservatives, artificial colours, or flavours. Ever.' },
+  { icon: '🌿', title: '100% Natural', body: 'No preservatives, artificial colours, or flavours. Ever.' },
   { icon: '♻️', title: 'Eco Packaging', body: 'Compostable kraft bags and glass jars. Beautiful and responsible.' },
-  { icon: '🚚', title: 'Farm Direct',   body: 'Farming families directly — fresher product, fairer prices.' },
+  { icon: '🚚', title: 'Farm Direct', body: 'Farming families directly — fresher product, fairer prices.' },
 ]
 
 const TESTIMONIALS = [
@@ -38,13 +38,64 @@ const TESTIMONIALS = [
 ]
 
 export default function HomePage() {
-  const navigate  = useNavigate()
-  const homeRef   = useRef(null)
-  const ctxRef    = useRef(null)
+  const navigate = useNavigate()
+  const homeRef = useRef(null)
+  const ctxRef = useRef(null)
   const revealRef = useRef([])
 
   const [products, setProducts] = useState([])
-  const [loading,  setLoading]  = useState(true)
+  const [loading, setLoading] = useState(true)
+
+  const [activeSlide, setActiveSlide] = useState(0);
+
+  const HERO_SLIDES = [
+    {
+      image: '/hero/hero-01.png',
+      eyebrow: 'PREMIUM ORGANIC COLLECTION',
+      title: "Nature's",
+      accent: 'Finest.',
+      body: 'Premium dry fruits and natural products sourced directly from trusted farms.',
+    },
+    {
+      image: '/hero/hero-02.png',
+      eyebrow: 'PURE • NATURAL • PREMIUM',
+      title: 'Goodness',
+      accent: 'In Every Bite.',
+      body: 'Handpicked dry fruits packed fresh to preserve their natural taste and goodness.',
+    },
+    {
+      image: '/hero/hero-03.png',
+      eyebrow: 'FROM FARM TO TABLE',
+      title: 'Fresh From',
+      accent: 'Trusted Farms.',
+      body: 'Quality ingredients sourced directly from farmers who care about what they grow.',
+    },
+    {
+      image: '/hero/hero-04.png',
+      eyebrow: 'HEALTHY SNACKING',
+      title: 'Snack Better.',
+      accent: 'Live Better.',
+      body: 'Wholesome natural snacks made for everyday moments.',
+    },
+  ];
+
+
+  const nextSlide = useCallback(() => {
+    setActiveSlide(current => (current + 1) % HERO_SLIDES.length);
+  }, []);
+
+  const prevSlide = useCallback(() => {
+    setActiveSlide(current =>
+      (current - 1 + HERO_SLIDES.length) % HERO_SLIDES.length
+    );
+  }, []);
+
+  useEffect(() => {
+    const timer = setInterval(nextSlide, 6000);
+
+    return () => clearInterval(timer);
+  }, [nextSlide]);
+
 
   useEffect(() => {
     productsAPI.getAll()
@@ -61,12 +112,12 @@ export default function HomePage() {
     const timer = setTimeout(() => {
       ctxRef.current = gsap.context(() => {
         const tl = gsap.timeline({ defaults: { ease: 'expo.out' } })
-        tl.fromTo('.hp-hero__label',       { y: 18, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.7 })
-          .fromTo('.hp-hero__line1',       { y: 60, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 1.1 }, '-=0.3')
-          .fromTo('.hp-hero__line2',       { y: 60, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 1.1 }, '-=0.8')
-          .fromTo('.hp-hero__body',        { y: 24, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.8 }, '-=0.6')
-          .fromTo('.hp-hero__cta > *',     { y: 20, autoAlpha: 0 }, { y: 0, autoAlpha: 1, stagger: 0.12, duration: 0.6 }, '-=0.5')
-          .fromTo('.hp-hero__pill',        { y: 14, autoAlpha: 0 }, { y: 0, autoAlpha: 1, stagger: 0.1, duration: 0.5 }, '-=0.4')
+        tl.fromTo('.hp-hero__label', { y: 18, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.7 })
+          .fromTo('.hp-hero__line1', { y: 60, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 1.1 }, '-=0.3')
+          .fromTo('.hp-hero__line2', { y: 60, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 1.1 }, '-=0.8')
+          .fromTo('.hp-hero__body', { y: 24, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.8 }, '-=0.6')
+          .fromTo('.hp-hero__cta > *', { y: 20, autoAlpha: 0 }, { y: 0, autoAlpha: 1, stagger: 0.12, duration: 0.6 }, '-=0.5')
+          .fromTo('.hp-hero__pill', { y: 14, autoAlpha: 0 }, { y: 0, autoAlpha: 1, stagger: 0.1, duration: 0.5 }, '-=0.4')
           .fromTo('.hp-hero__scroll-hint', { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.6 }, '-=0.2')
       }, homeRef)
     }, 60)
@@ -98,13 +149,15 @@ export default function HomePage() {
       img.src = TRAIL_IMGS[Math.floor(Math.random() * TRAIL_IMGS.length)]
       img.className = 'hp-trail-img'
       img.style.left = `${e.clientX}px`
-      img.style.top  = `${e.clientY}px`
+      img.style.top = `${e.clientY}px`
       document.body.appendChild(img)
       gsap.fromTo(img,
         { scale: 0, opacity: 0.9 },
-        { scale: 1.1, opacity: 0, x: (Math.random()-0.5)*160, y: (Math.random()-0.5)*160,
-          rotate: (Math.random()-0.5)*180, duration: 1.8, ease: 'power2.out',
-          onComplete: () => img.remove() }
+        {
+          scale: 1.1, opacity: 0, x: (Math.random() - 0.5) * 160, y: (Math.random() - 0.5) * 160,
+          rotate: (Math.random() - 0.5) * 180, duration: 1.8, ease: 'power2.out',
+          onComplete: () => img.remove()
+        }
       )
     }
     window.addEventListener('mousemove', onMove)
@@ -115,57 +168,126 @@ export default function HomePage() {
     <div className="hp" ref={homeRef}>
 
       {/* ══ HERO — full width, centred ══ */}
-      <section className="hp-hero" aria-label="Hero">
+      <section
+        className="hp-hero"
+        aria-label="Nutresa premium dry fruits"
+      >
+        <div className="hp-hero__slides">
 
-        {/* Logo top-centre */}
-        <div className="hp-hero__logo-wrap">
-          <img src="/logo.png" alt="Nutresa" className="hp-hero__logo-img" />
+          {HERO_SLIDES.map((slide, index) => (
+            <div
+              key={slide.image}
+              className={`hp-hero__slide ${index === activeSlide ? 'is-active' : ''
+                }`}
+              style={{
+                backgroundImage: `url(${slide.image})`,
+              }}
+            >
+              <div className="hp-hero__overlay" />
+
+              <div className="hp-hero__content">
+
+                <p className="hp-hero__label">
+                  <span className="hp-hero__label-dot" />
+                  {slide.eyebrow}
+                </p>
+
+                <h1 className="hp-hero__headline">
+                  <span className="hp-hero__line1">
+                    {slide.title}
+                  </span>
+
+                  <span className="hp-hero__line2">
+                    {slide.accent}
+                  </span>
+                </h1>
+
+                <p className="hp-hero__body">
+                  {slide.body}
+                </p>
+
+                <div className="hp-hero__cta">
+                  <button
+                    className="hp-btn hp-btn--primary"
+                    onClick={() => navigate('/shop')}
+                  >
+                    Shop Collection
+                    <span className="hp-btn__arrow">→</span>
+                  </button>
+
+                  <button
+                    className="hp-btn hp-btn--ghost"
+                    onClick={() => navigate('/about')}
+                  >
+                    Our Story
+                  </button>
+                </div>
+
+              </div>
+            </div>
+          ))}
+
         </div>
 
-        <p className="hp-hero__label">
-          <span className="hp-hero__label-dot" /> Premium Organic Collection
-        </p>
+        {/* Previous */}
+        <button
+          type="button"
+          className="hp-hero__arrow hp-hero__arrow--prev"
+          onClick={prevSlide}
+          aria-label="Previous slide"
+        >
+          ←
+        </button>
 
-        <h1 className="hp-hero__headline">
-          <span className="hp-hero__line1">Nature's</span>
-          <span className="hp-hero__line2">Finest.</span>
-        </h1>
+        {/* Next */}
+        <button
+          type="button"
+          className="hp-hero__arrow hp-hero__arrow--next"
+          onClick={nextSlide}
+          aria-label="Next slide"
+        >
+          →
+        </button>
 
-        <p className="hp-hero__body">
-          Premium dry fruits and natural products sourced directly from trusted farms —
-          harvested at peak ripeness, packed with care, delivered to your door.
-        </p>
+        {/* Bottom navigation */}
+        <div className="hp-hero__navigation">
 
-        <div className="hp-hero__cta">
-          <button className="hp-btn hp-btn--primary" onClick={() => navigate('/shop')}>
-            Shop Collection
-          </button>
-          <button className="hp-btn hp-btn--ghost" onClick={() => navigate('/about')}>
-            Our Story <span className="hp-btn__arrow">→</span>
-          </button>
+          <div className="hp-hero__counter">
+            <span>
+              {String(activeSlide + 1).padStart(2, '0')}
+            </span>
+
+            <div className="hp-hero__counter-line" />
+
+            <span>
+              {String(HERO_SLIDES.length).padStart(2, '0')}
+            </span>
+          </div>
+
+          <div className="hp-hero__dots">
+            {HERO_SLIDES.map((_, index) => (
+              <button
+                key={index}
+                type="button"
+                className={index === activeSlide ? 'is-active' : ''}
+                onClick={() => setActiveSlide(index)}
+                aria-label={`Go to slide ${index + 1}`}
+              />
+            ))}
+          </div>
+
         </div>
 
-        {/* Trust pills below buttons */}
-        <div className="hp-hero__pills">
-          <span className="hp-hero__pill">🏆 Award-winning quality</span>
-          <span className="hp-hero__pill">✈️ Ships pan-India</span>
-          <span className="hp-hero__pill">🔒 Secure checkout</span>
-          <span className="hp-hero__pill">🌱 100% Natural</span>
+        <div className="hp-hero__progress">
+          <span key={activeSlide} />
         </div>
-
-        <p className="hp-hero__scroll-hint">Scroll to explore ↓</p>
-
-        {/* Background decoration — subtle orbs */}
-        <div className="hp-hero__bg-orb hp-hero__bg-orb--1" aria-hidden="true" />
-        <div className="hp-hero__bg-orb hp-hero__bg-orb--2" aria-hidden="true" />
-        <div className="hp-hero__bg-orb hp-hero__bg-orb--3" aria-hidden="true" />
       </section>
 
       {/* ══ MARQUEE ══ */}
       <div className="hp-marquee" aria-hidden="true">
         <div className="hp-marquee__track">
           {[...Array(3)].flatMap((_, i) =>
-            ['Premium Almonds','Organic Cashews','Medjool Dates','Kashmiri Walnuts','Turkish Figs','Iranian Pistachios','Sun-dried Raisins'].map((t,j) => (
+            ['Premium Almonds', 'Organic Cashews', 'Medjool Dates', 'Kashmiri Walnuts', 'Turkish Figs', 'Iranian Pistachios', 'Sun-dried Raisins'].map((t, j) => (
               <span key={`${i}-${j}`} className="hp-marquee__item"><span className="hp-marquee__dot" />{t}</span>
             ))
           )}
@@ -203,12 +325,12 @@ export default function HomePage() {
         </div>
         <div className="hp-products__grid">
           {loading
-            ? [1,2,3,4].map(i => <div key={i} className="hp-skeleton" />)
+            ? [1, 2, 3, 4].map(i => <div key={i} className="hp-skeleton" />)
             : products.map(p => (
-                <div key={p.id} className="hp-product-wrap reveal-item" ref={addReveal}>
-                  <ProductCard product={p} />
-                </div>
-              ))
+              <div key={p.id} className="hp-product-wrap reveal-item" ref={addReveal}>
+                <ProductCard product={p} />
+              </div>
+            ))
           }
         </div>
       </section>
@@ -239,7 +361,7 @@ export default function HomePage() {
             <div className="hp-editorial__orb hp-editorial__orb--1" />
             <div className="hp-editorial__orb hp-editorial__orb--2" />
             <div className="hp-editorial__fruit-grid">
-              {['/dryfruits/fig.png','/dryfruits/raisins.png','/dryfruits/pumpkin.png','/dryfruits/sunflower.png'].map((s,i) => (
+              {['/dryfruits/fig.png', '/dryfruits/raisins.png', '/dryfruits/pumpkin.png', '/dryfruits/sunflower.png'].map((s, i) => (
                 <img key={i} src={s} alt="" className="hp-editorial__fruit" />
               ))}
             </div>
@@ -302,7 +424,7 @@ export default function HomePage() {
           </div>
         </div>
         <div className="hp-cta__fruits" aria-hidden="true">
-          {['/dryfruits/almond.png','/dryfruits/cashew.png','/dryfruits/walnut.png','/dryfruits/pistachio.png','/dryfruits/dates.png'].map((s,i) => (
+          {['/dryfruits/almond.png', '/dryfruits/cashew.png', '/dryfruits/walnut.png', '/dryfruits/pistachio.png', '/dryfruits/dates.png'].map((s, i) => (
             <img key={i} src={s} alt="" className="hp-cta__fruit" />
           ))}
         </div>

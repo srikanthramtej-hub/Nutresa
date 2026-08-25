@@ -526,13 +526,30 @@ export default function AdminPage() {
   }
 
   async function deleteProduct(id, name) {
-    if (!window.confirm(`Delete "${name}"? This cannot be undone.`)) return
-    try {
-      await adminAPI.deleteProduct(id)
-      setProducts(prev => prev.filter(p => p.id !== id))
-      showToast('Product deleted.')
-    } catch { showToast('Failed to delete product') }
+  if (!window.confirm(`Delete "${name}"? This cannot be undone.`)) return
+
+  try {
+    console.log('Deleting product:', id)
+
+    const response = await adminAPI.deleteProduct(id)
+
+    console.log('Delete response:', response)
+
+    setProducts(prev => prev.filter(p => p.id !== id))
+    showToast('Product deleted.')
+
+  } catch (err) {
+    console.error('DELETE PRODUCT ERROR:', err)
+    console.error('Response:', err.response?.data)
+    console.error('Status:', err.response?.status)
+
+    showToast(
+      err.response?.data?.message ||
+      err.response?.data?.error ||
+      'Failed to delete product'
+    )
   }
+}
 
   async function updateStock(id, val) {
     const stock = parseInt(val)

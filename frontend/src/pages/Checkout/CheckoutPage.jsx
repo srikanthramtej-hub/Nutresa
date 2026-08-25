@@ -146,7 +146,7 @@ export default function CheckoutPage({ cart, onOrderPlaced, showToast }) {
     phone: "",
     line1: "",
     city: "",
-    state: "Andhra Pradesh",
+    state: "",
     pin: "",
   });
   const [payment, setPayment] = useState("upi");
@@ -389,12 +389,9 @@ export default function CheckoutPage({ cart, onOrderPlaced, showToast }) {
                 </div>
                 <div className="form-group">
                   <label className="form-label">Phone *</label>
-                  <input
-                    className="form-input"
-                    value={address.phone}
-                    onChange={(e) => change("phone", e.target.value)}
-                    placeholder="+91 98765 43210"
-                  />
+                  <input className="form-input" type="tel" value={address.phone}
+                    onChange={e => change('phone', e.target.value.replace(/[^0-9+]/g, ''))}
+                    placeholder="Enter Phone Number" maxLength={13} />
                 </div>
               </div>
               <div className="form-group">
@@ -413,6 +410,7 @@ export default function CheckoutPage({ cart, onOrderPlaced, showToast }) {
                     className="form-input"
                     value={address.city}
                     onChange={(e) => change("city", e.target.value)}
+                    placeholder="Enter City"
                   />
                 </div>
                 <div className="form-group">
@@ -420,18 +418,15 @@ export default function CheckoutPage({ cart, onOrderPlaced, showToast }) {
                   <input
                     className="form-input"
                     value={address.state}
-                    onChange={(e) => change("state", e.target.value)}
+                    onChange={(e) => change("state", e.target.value) }
+                    placeholder="Enter State"
                   />
                 </div>
                 <div className="form-group">
                   <label className="form-label">PIN Code *</label>
-                  <input
-                    className="form-input"
-                    value={address.pin}
-                    onChange={(e) => change("pin", e.target.value)}
-                    placeholder="500001"
-                    maxLength={6}
-                  />
+                  <input className="form-input" type="tel" value={address.pin}
+                    onChange={e => change('pin', e.target.value.replace(/[^0-9]/g, ''))}
+                    placeholder="Enter PIN/ZIP Code" maxLength={6} />
                 </div>
               </div>
             </div>

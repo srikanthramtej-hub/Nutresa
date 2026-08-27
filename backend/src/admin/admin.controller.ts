@@ -3,34 +3,67 @@ import {
   Body, Param, UseGuards, Res,
   UseInterceptors, UploadedFiles, ParseIntPipe,
 } from '@nestjs/common'
+
 import { FilesInterceptor } from '@nestjs/platform-express'
-import { diskStorage } from 'multer'
-import { extname, join } from 'path'
-import { existsSync, mkdirSync } from 'fs'
+import { memoryStorage } from 'multer'
+import { extname } from 'path'
+import { createClient } from '@supabase/supabase-js'
 import { AdminService } from './admin.service'
 import { JwtAuthGuard } from '../auth/jwt-auth.guard'
 import { AdminGuard } from '../auth/admin.guard'
 
-const uploadDir = join(process.cwd(), 'uploads', 'products')
-if (!existsSync(uploadDir)) mkdirSync(uploadDir, { recursive: true })
 
-const productImageStorage = diskStorage({
-  destination: (req, file, cb) => cb(null, uploadDir),
-  filename: (req, file, cb) => {
-    const unique = Date.now() + '-' + Math.round(Math.random() * 1e6)
-    cb(null, `product-${unique}${extname(file.originalname)}`)
-  },
-})
 
 const imageFilter = (req: any, file: any, cb: any) => {
   if (!file.mimetype.startsWith('image/')) return cb(new Error('Only image files allowed'), false)
   cb(null, true)
 }
 
+const supabase = createClient(
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+)
+
+const SUPABASE_BUCKET =
+  process.env.SUPABASE_BUCKET || 'product-images'
 @Controller('admin')
 @UseGuards(JwtAuthGuard, AdminGuard)
 export class AdminController {
   constructor(private admin: AdminService) { }
+
+  // ── Supabase Product Image Upload ──
+  private async uploadProductImages(
+    files: Express.Multer.File[],
+  ): Promise<string[]> {
+    const urls: string[] = []
+
+    for (const file of files || []) {
+      const extension = extname(file.originalname).toLowerCase()
+
+      const filename =
+        `product-${Date.now()}-${Math.round(Math.random() * 1e6)}${extension}`
+
+      const { error } = await supabase.storage
+        .from(SUPABASE_BUCKET)
+        .upload(filename, file.buffer, {
+          contentType: file.mimetype,
+          upsert: false,
+        })
+
+      if (error) {
+        console.error('Supabase upload error:', error)
+        throw new Error(`Failed to upload image: ${error.message}`)
+      }
+
+      const { data } = supabase.storage
+        .from(SUPABASE_BUCKET)
+        .getPublicUrl(filename)
+
+      urls.push(data.publicUrl)
+    }
+
+    return urls
+  }
 
   // ── Dashboard ──
   @Get('dashboard')
@@ -61,24 +94,48 @@ export class AdminController {
   getAllProducts() { return this.admin.getAllProducts() }
 
   @Post('products')
-  @UseInterceptors(FilesInterceptor('images', 5, { storage: productImageStorage, fileFilter: imageFilter, limits: { fileSize: 5 * 1024 * 1024 } }))
-  async createProduct(@UploadedFiles() files: Express.Multer.File[], @Body() body: any) {
-    const imageUrls = (files || []).map(f => `/uploads/products/${f.filename}`)
-    if (body.weightOptions && typeof body.weightOptions === 'string') {
-      try { body.weightOptions = JSON.parse(body.weightOptions) } catch { body.weightOptions = [] }
+@UseInterceptors(
+  FilesInterceptor('images', 5, {
+    storage: memoryStorage(),
+    fileFilter: imageFilter,
+    limits: { fileSize: 5 * 1024 * 1024 },
+  }),
+)
+async createProduct(
+  @UploadedFiles() files: Express.Multer.File[],
+  @Body() body: any,
+) {
+  const imageUrls = await this.uploadProductImages(files || [])
+
+  if (body.weightOptions && typeof body.weightOptions === 'string') {
+    try {
+      body.weightOptions = JSON.parse(body.weightOptions)
+    } catch {
+      body.weightOptions = []
     }
-    if (body.tags && typeof body.tags === 'string') {
-      try { body.tags = JSON.parse(body.tags) } catch { body.tags = body.tags.split(',').map((t: string) => t.trim()).filter(Boolean) }
-    }
-    body.isNew = body.isNew === 'true' || body.isNew === true
-    body.isActive = body.isActive !== 'false'
-    return this.admin.createProduct(body, imageUrls)
   }
 
+  if (body.tags && typeof body.tags === 'string') {
+    try {
+      body.tags = JSON.parse(body.tags)
+    } catch {
+      body.tags = body.tags
+        .split(',')
+        .map((t: string) => t.trim())
+        .filter(Boolean)
+    }
+  }
+
+  body.isNew = body.isNew === 'true' || body.isNew === true
+  body.isActive = body.isActive !== 'false'
+
+  return this.admin.createProduct(body, imageUrls)
+}
+
   @Put('products/:id')
-  @UseInterceptors(FilesInterceptor('images', 5, { storage: productImageStorage, fileFilter: imageFilter, limits: { fileSize: 5 * 1024 * 1024 } }))
+  @UseInterceptors(FilesInterceptor('images', 5, { storage: memoryStorage(), fileFilter: imageFilter, limits: { fileSize: 5 * 1024 * 1024 } }))
   async updateProduct(@Param('id', ParseIntPipe) id: number, @UploadedFiles() files: Express.Multer.File[], @Body() body: any) {
-    const newImageUrls = files && files.length > 0 ? files.map(f => `/uploads/products/${f.filename}`) : undefined
+    const newImageUrls = files && files.length > 0 ?  await this.uploadProductImages(files) : undefined
     if (body.weightOptions && typeof body.weightOptions === 'string') {
       try { body.weightOptions = JSON.parse(body.weightOptions) } catch { body.weightOptions = [] }
     }

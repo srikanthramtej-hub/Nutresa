@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { adminAPI } from '../../api'
 import AdminPolicies from './Adminpolicies'
-import AdminSettings from './AdminSettings'
+import AdminSettings from './Adminsettings'
 import './AdminPage.css'
 
 const UPLOADS = import.meta.env.VITE_UPLOADS_URL || 'http://localhost:4000'
